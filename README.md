@@ -12,21 +12,19 @@ Game Enemy AI is a Java application demonstrating the Strategy Design Pattern.
 
 The project simulates an enemy in a game that can dynamically change its behavior between aggressive, defensive, and stealth modes without modifying the enemy class.
 
-## 2. Project Structure
 
-```text
-src/
-└── main/
-    └── java/
-        ├── Main.java
-        ├── Enemy.java
-        ├── EnemyBehavior.java
-        ├── AggressiveBehavior.java
-        ├── DefensiveBehavior.java
-        └── StealthBehavior.java
-pom.xml
-README.md
-```
+## Project Structure
+
+GameEnemyAI/
+├── EnemyBehavior/
+│   ├── EnemyBehavior.java
+│   ├── AggressiveBehavior.java
+│   ├── DefensiveBehavior.java
+│   └── StealthBehavior.java
+├── Enemy.java
+├── Main.java
+└── README.md
+
 
 ## 3. Strategy Pattern Components
 

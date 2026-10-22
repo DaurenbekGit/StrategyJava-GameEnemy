@@ -5,16 +5,23 @@
 **Course:** Software Design Patterns  
 **Assignment:** #5 — Strategy Pattern  
 **Programming Language:** Java  
-**Build Tool:** Maven  
 **Design Pattern:** Behavioral — Strategy
 
-Game Enemy AI is a Java application demonstrating the Strategy Design Pattern.
+Game Enemy AI is a Java application that demonstrates the implementation of the Strategy Design Pattern.
 
-The project simulates an enemy in a game that can dynamically change its behavior between aggressive, defensive, and stealth modes without modifying the enemy class.
+The project simulates an enemy in a game that can dynamically change its behavior during runtime.
 
+The enemy supports three different behaviors:
 
-## Project Structure
+- **Aggressive Behavior** — attacks the player.
+- **Defensive Behavior** — blocks incoming attacks.
+- **Stealth Behavior** — hides from the player.
 
+The main goal is to demonstrate how different algorithms can be switched without modifying the Context class.
+
+## 2. Project Structure
+
+```text
 GameEnemyAI/
 ├── EnemyBehavior/
 │   ├── EnemyBehavior.java
@@ -24,44 +31,119 @@ GameEnemyAI/
 ├── Enemy.java
 ├── Main.java
 └── README.md
+```
 
+### File Responsibilities
+
+| File | Responsibility |
+|---|---|
+| `EnemyBehavior.java` | Defines the common behavior interface |
+| `AggressiveBehavior.java` | Implements attacking behavior |
+| `DefensiveBehavior.java` | Implements defensive behavior |
+| `StealthBehavior.java` | Implements stealth behavior |
+| `Enemy.java` | Stores and switches enemy strategies |
+| `Main.java` | Creates the enemy and demonstrates strategy switching |
 
 ## 3. Strategy Pattern Components
 
-| Component | Java File | Responsibility |
-|---|---|---|
-| Strategy Interface | EnemyBehavior.java | Defines the common execute() method |
-| Concrete Strategy | AggressiveBehavior.java | Implements attacking behavior |
-| Concrete Strategy | DefensiveBehavior.java | Implements defensive behavior |
-| Concrete Strategy | StealthBehavior.java | Implements stealth behavior |
-| Context | Enemy.java | Stores, executes, and switches strategies |
-| Client | Main.java | Creates the enemy and selects strategies |
+The project contains all four main components of the Strategy Design Pattern.
 
-## 4. How It Works
+### Strategy Interface — EnemyBehavior
 
-The Strategy Pattern allows different algorithms to be selected and changed at runtime.
-
-1. The `EnemyBehavior` interface defines the `execute()` method.
-2. Three concrete strategy classes implement different enemy behaviors.
-3. The `Enemy` class stores a reference to the current strategy.
-4. The `Main` class creates an enemy and selects its initial behavior.
-5. The `setBehavior()` method allows switching strategies during execution.
-6. The `performAction()` method delegates execution to the selected strategy.
-
-### Example
+The `EnemyBehavior` interface defines a common method that every strategy must implement.
 
 ```java
-Enemy enemy = new Enemy(new AggressiveBehavior());
-enemy.performAction();
-
-enemy.setBehavior(new DefensiveBehavior());
-enemy.performAction();
-
-enemy.setBehavior(new StealthBehavior());
-enemy.performAction();
+public interface EnemyBehavior {
+    void execute();
+}
 ```
 
-### Expected Output
+### Concrete Strategies
+
+Three classes implement the `EnemyBehavior` interface.
+
+**AggressiveBehavior**
+
+```java
+public class AggressiveBehavior implements EnemyBehavior {
+    @Override
+    public void execute() {
+        System.out.println("Enemy attacks the player!");
+    }
+}
+```
+
+**DefensiveBehavior**
+
+```java
+public class DefensiveBehavior implements EnemyBehavior {
+    @Override
+    public void execute() {
+        System.out.println("Enemy blocks the attack!");
+    }
+}
+```
+
+**StealthBehavior**
+
+```java
+public class StealthBehavior implements EnemyBehavior {
+    @Override
+    public void execute() {
+        System.out.println("Enemy hides from the player!");
+    }
+}
+```
+
+Each strategy implements the same method but provides a different behavior.
+
+### Context — Enemy
+
+The `Enemy` class stores a reference to the Strategy interface and delegates behavior execution to the selected strategy.
+
+```java
+public class Enemy {
+    private EnemyBehavior behavior;
+
+    public Enemy(EnemyBehavior behavior) {
+        this.behavior = behavior;
+    }
+
+    public void setBehavior(EnemyBehavior behavior) {
+        this.behavior = behavior;
+    }
+
+    public void performAction() {
+        behavior.execute();
+    }
+}
+```
+
+The `setBehavior()` method allows changing strategies at runtime.
+
+The Context does not contain conditional statements for choosing strategies.
+
+### Client — Main
+
+The `Main` class creates an enemy, selects its initial strategy, and changes its behavior during execution.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Enemy enemy = new Enemy(new AggressiveBehavior());
+
+        enemy.performAction();
+
+        enemy.setBehavior(new DefensiveBehavior());
+        enemy.performAction();
+
+        enemy.setBehavior(new StealthBehavior());
+        enemy.performAction();
+    }
+}
+```
+
+## 4. Expected Output
 
 ```text
 Enemy attacks the player!
@@ -69,39 +151,57 @@ Enemy blocks the attack!
 Enemy hides from the player!
 ```
 
+The output demonstrates that the same enemy object can execute different behaviors without modifying the `Enemy` class.
+
 ## 5. Clean Code Principles
 
-The implementation follows five important Clean Code principles.
+The project demonstrates five important Clean Code principles.
 
 ### 1. Polymorphism Instead of Conditional Logic
 
-Each behavior implements the same interface.
+Each behavior implements the same `EnemyBehavior` interface.
 
-The `Enemy` class does not require `if/else` or `switch` statements to select or execute a specific behavior.
+The `Enemy` class does not require `if/else` or `switch` statements to determine the current behavior.
+
+Instead, the selected strategy executes its own implementation of `execute()`.
 
 ### 2. Meaningful Naming
 
-Classes and methods use descriptive names such as `AggressiveBehavior`, `setBehavior()`, and `performAction()`.
+The project uses descriptive names such as:
 
-This makes the code easier to understand and maintain.
+- `AggressiveBehavior`
+- `DefensiveBehavior`
+- `StealthBehavior`
+- `setBehavior()`
+- `performAction()`
+
+These names clearly describe the responsibilities of classes and methods.
 
 ### 3. Single Responsibility Principle (SRP)
 
-Each class has one main responsibility.
+Each strategy class has one main responsibility.
 
-For example, `AggressiveBehavior` handles attacking behavior, while `Enemy` manages the currently selected strategy.
+For example:
+
+- `AggressiveBehavior` handles attacking.
+- `DefensiveBehavior` handles defending.
+- `StealthBehavior` handles hiding.
+
+The `Enemy` class is responsible for managing and executing the selected behavior.
 
 ### 4. Algorithm-Independent Context
 
-The `Enemy` class depends on the `EnemyBehavior` interface rather than specific implementations.
+The `Enemy` class depends on the `EnemyBehavior` interface instead of concrete strategy classes.
 
-This separates the enemy's main logic from individual algorithms.
+This keeps the Context independent of the internal implementation of each algorithm.
 
 ### 5. Open/Closed Principle (OCP)
 
-The project can be extended with new strategies without modifying existing classes.
+The application can be extended with new strategies without changing the existing Context.
 
-For example, a new `PatrolBehavior` class can implement `EnemyBehavior` and be used by the existing `Enemy` context.
+For example, a new `PatrolBehavior` strategy can implement the `EnemyBehavior` interface.
+
+The existing `Enemy` class can use the new strategy without modification.
 
 ## 6. How to Run
 
@@ -109,36 +209,50 @@ For example, a new `PatrolBehavior` class can implement `EnemyBehavior` and be u
 
 - Java JDK
 - IntelliJ IDEA or another Java IDE
-- Maven
 
-### Steps
+### Run Using IntelliJ IDEA
 
-1. Open the project in IntelliJ IDEA.
-2. Load the Maven project.
-3. Open `src/main/java/Main.java`.
-4. Run the `main()` method.
-5. Check the output in the Run console.
+1. Clone or download the GitHub repository.
+2. Open the project in IntelliJ IDEA.
+3. Make sure the Java JDK is configured.
+4. Open `Main.java`.
+5. Run the `main()` method.
+6. Check the output in the console.
 
-Alternatively, compile and run the Java files from the project root:
+### Run Using Terminal
+
+If the source files have no package declarations, compile them from the repository root:
 
 ```bash
-javac -d out src/main/java/*.java
+javac -d out EnemyBehavior/*.java Enemy.java Main.java
+```
+
+Run the program:
+
+```bash
 java -cp out Main
 ```
 
+**Note:** If Java package declarations are used, the compilation and execution commands must match the declared packages.
+
 ## 7. Advantages of Strategy Pattern
 
-- Allows switching algorithms at runtime.
+The Strategy Pattern provides several advantages:
+
+- Supports runtime algorithm switching.
 - Reduces conditional logic.
-- Promotes code reusability.
-- Improves maintainability.
-- Makes adding new behaviors easier.
-- Supports polymorphism and separation of responsibilities.
+- Improves code readability.
+- Encourages polymorphism.
+- Separates algorithms into independent classes.
+- Makes the application easier to maintain.
+- Allows new behaviors to be added without changing the Context.
 
 ## 8. Conclusion
 
-The Game Enemy AI project demonstrates the Strategy Design Pattern through three interchangeable enemy behaviors.
+The Game Enemy AI project demonstrates the Strategy Design Pattern using three interchangeable enemy behaviors: Aggressive, Defensive, and Stealth.
 
-The `Enemy` context can dynamically change its behavior using the `setBehavior()` method without modifying its internal implementation.
+The `EnemyBehavior` interface defines a common contract, while the concrete strategies provide different implementations.
 
-The project illustrates how polymorphism, clean code principles, and separation of responsibilities can improve software design.
+The `Enemy` class acts as the Context and supports changing strategies dynamically through the `setBehavior()` method.
+
+This implementation demonstrates polymorphism, separation of responsibilities, extensibility, and important Clean Code principles.
